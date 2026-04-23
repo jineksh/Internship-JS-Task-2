@@ -1,163 +1,139 @@
-
 const myform = document.getElementById('registrationForm');
 
-function validateInput(event) {
+function addLiveValidation(inputId, validationLogic) {
+    const field = document.getElementById(inputId);
+    field.addEventListener('input', () => {
+        validationLogic(); 
+    });
+}
 
+function validateName(){
     let isValid = true;
 
-
-    if (event) event.preventDefault();
-
     const fullName = document.getElementById('fullName').value.trim();
-
-    const email = document.getElementById('email').value;
-
-    const phone = document.getElementById('phone').value;
-
-    const dob = document.getElementById('dob').value;
-
-    const password = document.getElementById('password').value;
-
-    const confirmPassword = document.getElementById('confirmPassword').value;
-
+    const namePattern = /^[a-zA-Z\s]+$/;
     let nameError = document.getElementById('nameError');
 
     if (fullName === '') {
         nameError.textContent = 'Full name is required.';
         isValid = false;
-    }
-    else if (fullName.length < 8) {
-        nameError.textContent = 'Full name must require 8 characters.';
+    } else if (fullName.length < 8) {
+        nameError.textContent = 'Full name must be at least 8 characters.';
         isValid = false;
-    }
-    else if (!namePattern.test(fullName)) {
-        nameError.textContent = 'Only letters are allowed (no numbers or symbols).';
+    } else if (!namePattern.test(fullName)) {
+        nameError.textContent = 'Only letters and spaces allowed.';
         isValid = false;
-    }
-    else {
+    } else {
         nameError.textContent = '';
     }
 
+    return isValid;
+}
+
+function validateEmail(){
+    let isValid = true;
+     const email = document.getElementById('email').value.trim();
     let emailError = document.getElementById('emailError');
-    if (email === '') {
-        emailError.textContent = 'Email is required.';
+    if (email === '' || !/^\S+@\S+\.\S+$/.test(email)) {
+        emailError.textContent = email === '' ? 'Email is required.' : 'Enter a valid email.';
         isValid = false;
-
-    } else if (!/^\S+@\S+\.\S+$/.test(email)) {
-        emailError.textContent = 'Enter a valid email address.';
-        isValid = false;
-
     } else {
         emailError.textContent = '';
-
     }
+    return isValid;
+}
 
+function validatePhone(){
+    let isValid = true;
+    const phone = document.getElementById('phone').value.trim();
     let phoneError = document.getElementById('phoneError');
-    const phonePattern = /^[0-9]+$/;
-
-    if (phone === '') {
-        phoneError.textContent = 'Phone number is required';
+    if (phone.length !== 10 || !/^[0-9]+$/.test(phone)) {
+        phoneError.textContent = 'Phone must be exactly 10 digits.';
         isValid = false;
-    }
-    else if (!phonePattern.test(phone)) {
-        phoneError.textContent = 'Only numbers are allowed';
-        isValid = false;
-    }
-    
-    else if (phone.length !== 10) {
-        phoneError.textContent = 'Phone number must be exactly 10 digits';
-        isValid = false;
-    }
-    else {
+    } else {
         phoneError.textContent = '';
     }
+    return isValid;
+}
 
+function validateDOB(){
+    let isValid = true;
+    const dob = document.getElementById('dob').value;
     let dobError = document.getElementById('dobError');
-    if (dob == '') {
-        dobError.textContent = 'dob is required';
+    if (!dob) {
+        dobError.textContent = 'Date of Birth is required.';
         isValid = false;
-
-    }
-    else {
+    } else{
         dobError.textContent = '';
-
-    }
-
-
-    let passwordError = document.getElementById('passwordError');
-
-    if (password === '') {
-        passwordError.textContent = 'Password is required.';
-        isValid = false;
-
-    }
-    else if (password.length < 8) {
-        passwordError.textContent = 'Password must be at least 8 characters long.';
-        isValid = false;
-
-    }
-    else if (!/[A-Z]/.test(password)) {
-        passwordError.textContent = 'Include at least one uppercase letter (A-Z).';
-        isValid = false;
-
-    }
-    else if (!/[a-z]/.test(password)) {
-        passwordError.textContent = 'Include at least one lowercase letter (a-z).';
-        isValid = false;
-
-    }
-    else if (!/[0-9]/.test(password)) {
-        passwordError.textContent = 'Include at least one number (0-9).';
-
-    }
-    else if (!/[!@#$%^&*]/.test(password)) {
-        passwordError.textContent = 'Include at least one special character (!@#$%^&*).';
-
-    }
-    else {
-        passwordError.textContent = '';
-
-    }
-
-
-    let confirmError = document.getElementById('confirmError');
-
-    if (confirmPassword === '') {
-        confirmError.textContent = 'Please confirm your password.';
-        isValid = false;
-
-    }
-    else if (confirmPassword !== password) {
-        confirmError.textContent = 'Passwords do not match.';
-        alert('Password do not match.');
-        isValid = false;
-
-    }
-    else {
-        confirmError.textContent = '';
     }
 
     return isValid;
 
 }
 
+function passwordValidation(){
+
+    let isValid = true;
+    const password = document.getElementById('password').value;
+    let passwordError = document.getElementById('passwordError');
+    const hasUpper = /[A-Z]/.test(password);
+    const hasLower = /[a-z]/.test(password);
+    const hasNum = /[0-9]/.test(password);
+    const hasSpecial = /[!@#$%^&*]/.test(password);
+
+    if (password.length < 8 || !hasUpper || !hasLower || !hasNum || !hasSpecial) {
+        passwordError.textContent = 'Password needs 8+ chars, upper, lower, number, & symbol.';
+        isValid = false;
+    } else {
+        passwordError.textContent = '';
+    }
+
+    return isValid;
+
+}
+
+function validateConfirmPassword() {
+        
+
+    
+    let isValid = true;
+
+    const password = document.getElementById('password').value;
+   
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    let confirmError = document.getElementById('confirmError');
+    if (confirmPassword !== password || confirmPassword === '') {
+        confirmError.textContent = 'Passwords do not match.';
+        isValid = false;
+    } else {
+        confirmError.textContent = '';
+    }
+
+    return isValid;
+}
+
+addLiveValidation('fullName', validateName);
+addLiveValidation('email', validateEmail);
+addLiveValidation('phone', validatePhone);
+addLiveValidation('password', passwordValidation);
+addLiveValidation('confirmPassword', validateConfirmPassword);
+addLiveValidation('dob', validateDOB);
+
 
 myform.addEventListener('submit', function (event) {
-
-
     event.preventDefault();
 
-    console.log('button clicked');
+    const isValid =
+        validateName() &&
+        validateEmail() &&
+        validatePhone() &&
+        validateDOB() &&
+        passwordValidation() &&
+        validateConfirmPassword();
 
-    let valid = validateInput(event);
-
-    if (valid) {
-        console.log('Form is Valid');
-        alert('Form is Valid');
+    if (isValid) {
+        alert('Success! Form is ready to go.');
+    } else {
+        console.log('Form still has errors.');
     }
-    else {
-        console.log('Form is not valid');
-        alert('Form is not valid');
-    }
-
 });
