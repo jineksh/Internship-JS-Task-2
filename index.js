@@ -2,7 +2,7 @@ const myform = document.getElementById('registrationForm');
 
 function addLiveValidation(inputId, validationLogic) {
     const field = document.getElementById(inputId);
-    field.addEventListener('input', () => {
+   field.addEventListener('blur', () => {
         validationLogic();
     });
 }
@@ -56,20 +56,7 @@ function validatePhone() {
     return isValid;
 }
 
-function validateDOB() {
-    let isValid = true;
-    const dob = document.getElementById('dob').value;
-    let dobError = document.getElementById('dobError');
-    if (!dob) {
-        dobError.textContent = 'Date of Birth is required.';
-        isValid = false;
-    } else {
-        dobError.textContent = '';
-    }
 
-    return isValid;
-
-}
 
 let isConfirmTouched = false;
 
@@ -131,9 +118,10 @@ function validateConfirmPassword() {
 }
 
 function validateDOB() {
-    const dobInput = document.getElementById('dob').value; // Assuming ID is 'dob'
-    const dobError = document.getElementById('dobError');
+    const dobInput = document.getElementById('dob').value;
+    const dobError = document.getElementById('dobError'); 
 
+    // 1. Check if empty
     if (!dobInput) {
         dobError.textContent = 'Date of birth is required.';
         return false;
@@ -141,26 +129,27 @@ function validateDOB() {
 
     const selectedDate = new Date(dobInput);
     const today = new Date();
-
     today.setHours(0, 0, 0, 0);
 
+    // 2. Check if valid date format
     if (isNaN(selectedDate.getTime())) {
         dobError.textContent = 'Please enter a valid date.';
         return false;
     }
 
+    // 3. Minimum age logic (1900)
     const minDate = new Date("1900-01-01");
     if (selectedDate < minDate) {
         dobError.textContent = 'Date of birth cannot be earlier than 1900.';
         return false;
     }
 
-    // 4. Prevent future dates
     if (selectedDate > today) {
         dobError.textContent = 'Date of birth cannot be in the future.';
         return false;
     }
 
+    
     let age = today.getFullYear() - selectedDate.getFullYear();
     const monthDiff = today.getMonth() - selectedDate.getMonth();
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < selectedDate.getDate())) {
@@ -172,9 +161,21 @@ function validateDOB() {
         return false;
     }
 
-    // If all checks pass
-    dobError.textContent = '';
-    return true;
+    dobError.textContent = ''; 
+    return true; 
+}
+
+function validateTerms() {
+    const termsCheckbox = document.getElementById('terms');
+    const termsError = document.getElementById('termsError');
+    
+    if (!termsCheckbox.checked) {
+        termsError.textContent = 'You must agree to the terms and conditions.';
+        return false;
+    } else {
+        termsError.textContent = '';
+        return true;
+    }
 }
 
 addLiveValidation('fullName', validateName);
@@ -185,20 +186,28 @@ addLiveValidation('confirmPassword', validateConfirmPassword);
 addLiveValidation('dob', validateDOB);
 
 
+document.getElementById('terms').addEventListener('change', validateTerms);
+
 myform.addEventListener('submit', function (event) {
+
+
     event.preventDefault();
 
-    const isValid =
-        validateName() &&
-        validateEmail() &&
-        validatePhone() &&
-        validateDOB() &&
-        passwordValidation() &&
-        validateConfirmPassword();
+    const isNameValid = validateName();
+    const isEmailValid = validateEmail();
+    const isPhoneValid = validatePhone();
+    const isDOBValid = validateDOB();
+    const isPasswordValid = passwordValidation();
+    const isConfirmValid = validateConfirmPassword();
+    const isTermsValid = validateTerms();
+
+    const isValid = isNameValid && isEmailValid && isPhoneValid && isDOBValid && isPasswordValid && isConfirmValid && isTermsValid;
 
     if (isValid) {
         alert('Success! Form is ready to go.');
     } else {
         console.log('Form still has errors.');
     }
+
+    
 });
